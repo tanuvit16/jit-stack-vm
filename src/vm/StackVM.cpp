@@ -5,7 +5,7 @@
 
 StackVM::StackVM()
     : programCounter(0),
-      profiler(0) {
+      profiler() {
 }
 
 void StackVM::push(int64_t value) {
@@ -30,7 +30,7 @@ void StackVM::execute(
     programCounter = 0;
     stack.clear();
 
-    profiler = Profiler(program.size(), 10);
+    profiler = Profiler(program.size(), 3);
 
     while (programCounter < program.size()) {
 
