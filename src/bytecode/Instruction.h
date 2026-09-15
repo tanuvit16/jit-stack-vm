@@ -17,12 +17,24 @@ enum class OpCode {
     HALT
 };
 
+// struct Instruction {
+//     OpCode opcode;
+//     int64_t operand;
+
+//     Instruction(OpCode op, int64_t value = 0)
+//         : opcode(op), operand(value) {}
+// };
 struct Instruction {
+
     OpCode opcode;
     int64_t operand;
 
-    Instruction(OpCode op, int64_t value = 0)
-        : opcode(op), operand(value) {}
-};
+    Instruction()
+        : opcode(OpCode::HALT), operand(0) {
+    }
 
+    Instruction(OpCode op, int64_t value = 0)
+        : opcode(op), operand(value) {
+    }
+};
 #endif
