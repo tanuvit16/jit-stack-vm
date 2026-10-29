@@ -6,6 +6,7 @@
 
 #include <vector>
 #include <cstdint>
+#include <cstddef>
 
 class StackVM {
 private:
@@ -16,9 +17,11 @@ private:
 
     void push(int64_t value);
     int64_t pop();
+     std::size_t hotspotThreshold;
 
 public:
-    StackVM();
+    // StackVM();
+    explicit StackVM(std::size_t hotspotThreshold = 3);
 
     void execute(
         const std::vector<Instruction>& program

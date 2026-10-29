@@ -3,9 +3,15 @@
 #include <iostream>
 #include <stdexcept>
 
-StackVM::StackVM()
+// StackVM::StackVM()
+//     : programCounter(0),
+//       profiler() {
+// }
+
+StackVM::StackVM(std::size_t hotspotThreshold)
     : programCounter(0),
-      profiler() {
+      profiler(),
+      hotspotThreshold(hotspotThreshold) {
 }
 
 void StackVM::push(int64_t value) {
@@ -30,7 +36,8 @@ void StackVM::execute(
     programCounter = 0;
     stack.clear();
 
-    profiler = Profiler(program.size(), 3);
+    // profiler = Profiler(program.size(), 3);
+    profiler = Profiler(program.size(), hotspotThreshold);
 
     while (programCounter < program.size()) {
 

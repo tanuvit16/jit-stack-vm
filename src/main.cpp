@@ -22,1397 +22,6 @@
 
 
 
-// // #include <iostream>
-// // #include <string>
-// // #include <sstream>
-// // #include <vector>
-// // #include <cctype>
-// // #include <utility>
-
-// // #include "bytecode/Instruction.h"
-// // #include "vm/StackVM.h"
-// // #include "jit/JITCompiler.h"
-// // #include "benchmark/Benchmark.h"
-
-// // using namespace std;
-
-
-// // // ============================================================
-// // // Convert string to uppercase
-// // // ============================================================
-
-// // string toUpperCase(string text)
-// // {
-// //     for (size_t i = 0; i < text.length(); ++i)
-// //     {
-// //         text[i] = static_cast<char>(
-// //             toupper(
-// //                 static_cast<unsigned char>(text[i])
-// //             )
-// //         );
-// //     }
-
-// //     return text;
-// // }
-
-
-// // // ============================================================
-// // // Parse bytecode instruction
-// // // ============================================================
-
-// // Instruction parseInstruction(const string& line)
-// // {
-// //     stringstream ss(line);
-
-// //     string opcodeText;
-
-// //     ss >> opcodeText;
-
-// //     opcodeText = toUpperCase(opcodeText);
-
-
-// //     if (opcodeText == "PUSH")
-// //     {
-// //         long long value;
-
-// //         ss >> value;
-
-// //         return Instruction(
-// //             OpCode::PUSH,
-// //             value
-// //         );
-// //     }
-
-
-// //     if (opcodeText == "POP")
-// //     {
-// //         return Instruction(
-// //             OpCode::POP,
-// //             0
-// //         );
-// //     }
-
-
-// //     if (opcodeText == "DUP")
-// //     {
-// //         return Instruction(
-// //             OpCode::DUP,
-// //             0
-// //         );
-// //     }
-
-
-// //     if (opcodeText == "ADD")
-// //     {
-// //         return Instruction(
-// //             OpCode::ADD,
-// //             0
-// //         );
-// //     }
-
-
-// //     if (opcodeText == "SUB")
-// //     {
-// //         return Instruction(
-// //             OpCode::SUB,
-// //             0
-// //         );
-// //     }
-
-
-// //     if (opcodeText == "MUL")
-// //     {
-// //         return Instruction(
-// //             OpCode::MUL,
-// //             0
-// //         );
-// //     }
-
-
-// //     if (opcodeText == "DIV")
-// //     {
-// //         return Instruction(
-// //             OpCode::DIV,
-// //             0
-// //         );
-// //     }
-
-
-// //     if (opcodeText == "JUMP")
-// //     {
-// //         long long target;
-
-// //         ss >> target;
-
-// //         return Instruction(
-// //             OpCode::JUMP,
-// //             target
-// //         );
-// //     }
-
-
-// //     if (opcodeText == "JUMP_IF_ZERO")
-// //     {
-// //         long long target;
-
-// //         ss >> target;
-
-// //         return Instruction(
-// //             OpCode::JUMP_IF_ZERO,
-// //             target
-// //         );
-// //     }
-
-
-// //     if (opcodeText == "PRINT")
-// //     {
-// //         return Instruction(
-// //             OpCode::PRINT,
-// //             0
-// //         );
-// //     }
-
-
-// //     if (opcodeText == "HALT")
-// //     {
-// //         return Instruction(
-// //             OpCode::HALT,
-// //             0
-// //         );
-// //     }
-
-
-// //     cerr << "Invalid instruction: "
-// //          << line
-// //          << endl;
-
-
-// //     return Instruction(
-// //         OpCode::HALT,
-// //         0
-// //     );
-// // }
-
-
-// // // ============================================================
-// // // MAIN
-// // // ============================================================
-
-// // int main()
-// // {
-// //     cout << "====================================" << endl;
-// //     cout << "     Stack-Based Virtual Machine" << endl;
-// //     cout << "====================================" << endl;
-
-// //     cout << endl;
-
-
-// //     // ========================================================
-// //     // PHASE 1 — Instruction Set Design
-// //     // ========================================================
-
-// //     size_t instructionCount;
-
-// //     cout << "Enter number of instructions: ";
-
-// //     cin >> instructionCount;
-
-// //     cin.ignore();
-
-
-// //     vector<Instruction> program;
-
-
-// //     cout << endl;
-
-// //     cout << "Enter bytecode instructions:" << endl;
-
-// //     cout << "Supported instructions:" << endl;
-
-// //     cout << "PUSH <value>, POP, DUP, ADD, SUB, MUL, DIV," << endl;
-
-// //     cout << "JUMP <index>, JUMP_IF_ZERO <index>," << endl;
-
-// //     cout << "PRINT, HALT" << endl;
-
-// //     cout << endl;
-
-
-// //     for (size_t i = 0;
-// //          i < instructionCount;
-// //          ++i)
-// //     {
-// //         string line;
-
-// //         cout << i << ": ";
-
-// //         getline(cin, line);
-
-
-// //         program.push_back(
-// //             parseInstruction(line)
-// //         );
-// //     }
-
-
-// //     // ========================================================
-// //     // PHASE 2 + PHASE 3
-// //     // Stack VM + Interpreter
-// //     // ========================================================
-
-// //     cout << endl;
-
-// //     cout << "========== Execution =========="
-// //          << endl;
-
-
-// //     StackVM vm;
-
-
-// //     // --------------------------------------------------------
-// //     // Benchmark interpreter execution
-// //     // --------------------------------------------------------
-
-// //     Benchmark interpreterBenchmark;
-
-// //     interpreterBenchmark.start();
-
-
-// //     vm.execute(program);
-
-
-// //     long long interpreterTime =
-// //         interpreterBenchmark.stopMicroseconds();
-
-
-// //     // ========================================================
-// //     // PHASE 4 — Runtime Profiling
-// //     // ========================================================
-
-// //     const Profiler& profiler =
-// //         vm.getProfiler();
-
-
-// //     cout << endl;
-
-// //     cout << "========== Runtime Profiler =========="
-// //          << endl;
-
-
-// //     cout << "Profiler Status: ACTIVE"
-// //          << endl;
-
-
-// //     cout << "Instructions monitored: "
-// //          << program.size()
-// //          << endl;
-
-
-// //     cout << "Total instructions executed: "
-// //          << profiler.getTotalExecutions()
-// //          << endl;
-
-
-// //     cout << "Hotspot threshold: "
-// //          << profiler.getHotspotThreshold()
-// //          << endl;
-
-
-// //     cout << endl;
-
-// //     cout << "Execution Frequency:"
-// //          << endl;
-
-
-// //     for (size_t i = 0;
-// //          i < program.size();
-// //          ++i)
-// //     {
-// //         cout << "Instruction "
-// //              << i
-// //              << " -> "
-// //              << profiler.getExecutionCount(i)
-// //              << " execution(s)"
-// //              << endl;
-// //     }
-
-
-// //     // ========================================================
-// //     // PHASE 5 — Hotspot Detection
-// //     // ========================================================
-
-// //     cout << endl;
-
-// //     cout << "========== Hotspot Detection =========="
-// //          << endl;
-
-
-// //     cout << "Hotspot Threshold: "
-// //          << profiler.getHotspotThreshold()
-// //          << endl;
-
-
-// //     vector<
-// //         pair<size_t, Instruction>
-// //     > hotInstructions;
-
-
-// //     for (size_t i = 0;
-// //          i < program.size();
-// //          ++i)
-// //     {
-// //         unsigned long long count =
-// //             profiler.getExecutionCount(i);
-
-
-// //         cout << "Instruction "
-// //              << i
-// //              << " -> "
-// //              << count
-// //              << " execution(s) -> ";
-
-
-// //         if (profiler.isHot(i))
-// //         {
-// //             cout << "HOT";
-
-
-// //             hotInstructions.push_back(
-// //                 make_pair(
-// //                     i,
-// //                     program[i]
-// //                 )
-// //             );
-// //         }
-// //         else
-// //         {
-// //             cout << "NORMAL";
-// //         }
-
-
-// //         cout << endl;
-// //     }
-
-
-// //     cout << endl;
-
-// //     cout << "Hotspot Detection completed successfully."
-// //          << endl;
-
-
-// //     // ========================================================
-// //     // PHASE 6 — JIT Compilation
-// //     // ========================================================
-
-// //     cout << endl;
-
-// //     cout << "========== JIT Compilation =========="
-// //          << endl;
-
-
-// //     cout << "Hot instructions detected: "
-// //          << hotInstructions.size()
-// //          << endl;
-
-
-// //     if (hotInstructions.empty())
-// //     {
-// //         cout << "No hot instructions detected."
-// //              << endl;
-
-// //         cout << "JIT compilation skipped."
-// //              << endl;
-
-
-// //         // ====================================================
-// //         // PHASE 8 — Benchmarking
-// //         // ====================================================
-
-// //         cout << endl;
-
-// //         cout << "========== Phase 8: Benchmarking =========="
-// //              << endl;
-
-
-// //         cout << "Interpreter Execution Time : "
-// //              << interpreterTime
-// //              << " microseconds"
-// //              << endl;
-
-
-// //         cout << "JIT Compilation Time      : N/A"
-// //              << endl;
-
-
-// //         cout << "JIT Execution Time        : N/A"
-// //              << endl;
-
-
-// //         cout << "JIT Total Time            : N/A"
-// //              << endl;
-
-
-// //         cout << "Hot Instructions          : 0"
-// //              << endl;
-
-
-// //         cout << "Code Cache Entries        : 0"
-// //              << endl;
-
-
-// //         cout << endl;
-
-// //         cout << "Benchmark completed successfully."
-// //              << endl;
-// //     }
-// //     else
-// //     {
-// //         cout << "Passing hot instructions to JIT compiler..."
-// //              << endl;
-
-
-// //         JITCompiler jitCompiler;
-
-
-// //         // ====================================================
-// //         // PHASE 7 — First Cache Request
-// //         // ====================================================
-
-// //         cout << endl;
-
-// //         cout << "========== First JIT Request =========="
-// //              << endl;
-
-
-// //         cout << "Checking code cache..."
-// //              << endl;
-
-
-// //         if (jitCompiler.isCached(hotInstructions))
-// //         {
-// //             cout << "[CACHE] HIT"
-// //                  << endl;
-
-// //             cout << "[CACHE] Reusing previously compiled code."
-// //                  << endl;
-// //         }
-// //         else
-// //         {
-// //             cout << "[CACHE] MISS"
-// //                  << endl;
-
-// //             cout << "[CACHE] No compiled code found."
-// //                  << endl;
-// //         }
-
-
-// //         // ====================================================
-// //         // PHASE 6 — JIT Compilation Benchmark
-// //         // ====================================================
-
-// //         Benchmark jitCompilationBenchmark;
-
-// //         jitCompilationBenchmark.start();
-
-
-// //         jitCompiler.compile(
-// //             hotInstructions
-// //         );
-
-
-// //         long long jitCompilationTime =
-// //             jitCompilationBenchmark.stopMicroseconds();
-
-
-// //         // Display compiler information
-
-// //         jitCompiler.printCompilationInfo();
-
-
-// //         // ====================================================
-// //         // PHASE 6 — JIT Execution Benchmark
-// //         // ====================================================
-
-// //         Benchmark jitExecutionBenchmark;
-
-// //         jitExecutionBenchmark.start();
-
-
-// //      //    jitCompiler.execute(10000);
-// //      jitCompiler.executeOptimizedLoop(10000);
-
-
-// //         long long jitExecutionTime =
-// //             jitExecutionBenchmark.stopMicroseconds();
-
-
-// //         // ====================================================
-// //         // PHASE 7 — Second Cache Request
-// //         // ====================================================
-
-// //         cout << endl;
-
-// //         cout << "========== Second JIT Request =========="
-// //              << endl;
-
-
-// //         cout << "Checking code cache again..."
-// //              << endl;
-
-
-// //         if (jitCompiler.isCached(hotInstructions))
-// //         {
-// //             cout << "[CACHE] HIT"
-// //                  << endl;
-
-// //             cout << "[CACHE] Reusing previously compiled code."
-// //                  << endl;
-// //         }
-// //         else
-// //         {
-// //             cout << "[CACHE] MISS"
-// //                  << endl;
-// //         }
-
-
-// //         // Request the same compilation again.
-// //         // JITCompiler internally detects the cache hit.
-
-// //         jitCompiler.compile(
-// //             hotInstructions
-// //         );
-
-
-// //         cout << endl;
-
-// //         cout << "[CACHE] Cached code reused successfully."
-// //              << endl;
-
-
-// //         // ====================================================
-// //         // FINAL CACHE STATUS
-// //         // ====================================================
-
-// //         cout << endl;
-
-// //         cout << "========== Final Cache Status =========="
-// //              << endl;
-
-
-// //         cout << "Code Cache Entries: "
-// //              << jitCompiler.getCacheSize()
-// //              << endl;
-
-
-// //         cout << "Code caching phase completed successfully."
-// //              << endl;
-
-
-// //         // ====================================================
-// //         // PHASE 8 — BENCHMARKING
-// //         // ====================================================
-
-// //         cout << endl;
-
-// //         cout << "========== Phase 8: Benchmarking =========="
-// //              << endl;
-
-
-// //         cout << endl;
-
-
-// //         cout << "Interpreter Execution Time : "
-// //              << interpreterTime
-// //              << " microseconds"
-// //              << endl;
-
-
-// //         cout << "JIT Compilation Time      : "
-// //              << jitCompilationTime
-// //              << " microseconds"
-// //              << endl;
-
-
-// //         cout << "JIT Execution Time        : "
-// //              << jitExecutionTime
-// //              << " microseconds"
-// //              << endl;
-
-
-// //         cout << "JIT Total Time            : "
-// //              << jitCompilationTime
-// //              + jitExecutionTime
-// //              << " microseconds"
-// //              << endl;
-
-
-// //         cout << "Hot Instructions          : "
-// //              << hotInstructions.size()
-// //              << endl;
-
-
-// //         cout << "Compiled Instructions     : "
-// //              << hotInstructions.size()
-// //              << endl;
-
-
-// //         cout << "Code Cache Entries        : "
-// //              << jitCompiler.getCacheSize()
-// //              << endl;
-
-
-// //         // ----------------------------------------------------
-// //         // Performance comparison
-// //         // ----------------------------------------------------
-
-// //         cout << endl;
-
-// //         cout << "========== Performance Comparison =========="
-// //              << endl;
-
-
-// //         cout << "Interpreter Time : "
-// //              << interpreterTime
-// //              << " microseconds"
-// //              << endl;
-
-
-// //         cout << "JIT Total Time   : "
-// //              << jitCompilationTime
-// //              + jitExecutionTime
-// //              << " microseconds"
-// //              << endl;
-
-
-// //         if (interpreterTime > 0)
-// //         {
-// //             double speedup =
-// //                 static_cast<double>(interpreterTime)
-// //                 /
-// //                 static_cast<double>(
-// //                     jitCompilationTime
-// //                     + jitExecutionTime
-// //                 );
-
-
-// //             cout << "Measured Ratio   : "
-// //                  << speedup
-// //                  << "x"
-// //                  << endl;
-// //         }
-// //         else
-// //         {
-// //             cout << "Measured Ratio   : N/A"
-// //                  << endl;
-// //         }
-
-
-// //         cout << endl;
-
-// //         cout << "Note: This benchmark measures the "
-// //              << "current JIT prototype implementation."
-// //              << endl;
-
-// //         cout << "Native machine-code speedup is not "
-// //              << "claimed by this prototype."
-// //              << endl;
-
-
-// //         cout << endl;
-
-// //         cout << "Benchmark completed successfully."
-// //              << endl;
-// //     }
-
-
-// //     // ========================================================
-// //     // PROGRAM COMPLETED
-// //     // ========================================================
-
-// //     cout << endl;
-
-// //     cout << "===================================="
-// //          << endl;
-
-// //     cout << "          Program Completed"
-// //          << endl;
-
-// //     cout << "===================================="
-// //          << endl;
-
-
-// //     return 0;
-// // }
-
-
-
-
-
-
-
-
-
-
-// #include <iostream>
-// #include <vector>
-// #include <string>
-// #include <utility>
-// #include <stdexcept>
-
-// #include "bytecode/Instruction.h"
-// #include "vm/StackVM.h"
-// #include "jit/JITCompiler.h"
-// #include "benchmark/Benchmark.h"
-
-// using namespace std;
-
-// int main()
-// {
-//     // ========================================================
-//     // PROJECT HEADER
-//     // ========================================================
-
-//     cout << "====================================" << endl;
-//     cout << "     Stack-Based Virtual Machine" << endl;
-//     cout << "====================================" << endl;
-//     cout << endl;
-
-
-//     // ========================================================
-//     // BYTECODE INPUT
-//     // ========================================================
-
-//     int instructionCount;
-
-//     cout << "Enter number of instructions: ";
-//     cin >> instructionCount;
-
-//     cin.ignore();
-
-//     vector<Instruction> program;
-
-//     cout << endl;
-//     cout << "Enter bytecode instructions:" << endl;
-
-//     cout << "Supported instructions:" << endl;
-//     cout << "PUSH <value>, POP, DUP, ADD, SUB, MUL, DIV," << endl;
-//     cout << "JUMP <index>, JUMP_IF_ZERO <index>," << endl;
-//     cout << "PRINT, HALT" << endl;
-//     cout << endl;
-
-
-//     // ========================================================
-//     // INSTRUCTION INPUT
-//     // ========================================================
-
-//     for (int i = 0; i < instructionCount; i++)
-//     {
-//         string opcode;
-//         long long operand = 0;
-
-//         cout << i << ": ";
-
-//         cin >> opcode;
-
-//         if (opcode == "PUSH")
-//         {
-//             cin >> operand;
-
-//             program.push_back(
-//                 Instruction(OpCode::PUSH, operand)
-//             );
-//         }
-//         else if (opcode == "POP")
-//         {
-//             program.push_back(
-//                 Instruction(OpCode::POP, 0)
-//             );
-//         }
-//         else if (opcode == "DUP")
-//         {
-//             program.push_back(
-//                 Instruction(OpCode::DUP, 0)
-//             );
-//         }
-//         else if (opcode == "ADD")
-//         {
-//             program.push_back(
-//                 Instruction(OpCode::ADD, 0)
-//             );
-//         }
-//         else if (opcode == "SUB")
-//         {
-//             program.push_back(
-//                 Instruction(OpCode::SUB, 0)
-//             );
-//         }
-//         else if (opcode == "MUL")
-//         {
-//             program.push_back(
-//                 Instruction(OpCode::MUL, 0)
-//             );
-//         }
-//         else if (opcode == "DIV")
-//         {
-//             program.push_back(
-//                 Instruction(OpCode::DIV, 0)
-//             );
-//         }
-//         else if (opcode == "JUMP")
-//         {
-//             cin >> operand;
-
-//             program.push_back(
-//                 Instruction(OpCode::JUMP, operand)
-//             );
-//         }
-//         else if (opcode == "JUMP_IF_ZERO")
-//         {
-//             cin >> operand;
-
-//             program.push_back(
-//                 Instruction(OpCode::JUMP_IF_ZERO, operand)
-//             );
-//         }
-//         else if (opcode == "PRINT")
-//         {
-//             program.push_back(
-//                 Instruction(OpCode::PRINT, 0)
-//             );
-//         }
-//         else if (opcode == "HALT")
-//         {
-//             program.push_back(
-//                 Instruction(OpCode::HALT, 0)
-//             );
-//         }
-//         else
-//         {
-//             cout << "Invalid instruction: "
-//                  << opcode
-//                  << endl;
-
-//             return 1;
-//         }
-//     }
-
-
-//     // ========================================================
-//     // PHASE 1 — INTERPRETER EXECUTION
-//     // ========================================================
-
-//     cout << endl;
-//     cout << "========== Execution ==========" << endl;
-
-//     StackVM vm;
-
-//     Benchmark interpreterBenchmark;
-
-//     interpreterBenchmark.start();
-
-//     vm.execute(program);
-
-//     long long interpreterTime =
-//         interpreterBenchmark.stopMicroseconds();
-
-
-//     // ========================================================
-//     // PHASE 2 — RUNTIME PROFILER
-//     // ========================================================
-
-//     const Profiler& profiler =
-//         vm.getProfiler();
-
-//     cout << endl;
-//     cout << "========== Runtime Profiler =========="
-//          << endl;
-
-//     profiler.printReport();
-
-
-//     // ========================================================
-//     // PHASE 3 — HOTSPOT DETECTION
-//     // ========================================================
-
-//     cout << endl;
-//     cout << "========== Hotspot Detection =========="
-//          << endl;
-
-//     profiler.printHotspots();
-
-
-//     // ========================================================
-//     // PHASE 4 — COLLECT HOT INSTRUCTIONS
-//     // ========================================================
-
-//     vector<pair<size_t, Instruction> >
-//         hotInstructions;
-
-//     const vector<size_t>& frequencies =
-//         profiler.getExecutionCounts();
-
-//     const size_t threshold =
-//         profiler.getHotspotThreshold();
-
-//     for (size_t i = 0;
-//          i < program.size();
-//          i++)
-//     {
-//         if (frequencies[i] >= threshold)
-//         {
-//             hotInstructions.push_back(
-//                 make_pair(i, program[i])
-//             );
-//         }
-//     }
-
-
-//     // ========================================================
-//     // PHASE 5 — JIT COMPILATION
-//     // ========================================================
-
-//     cout << endl;
-//     cout << "========== JIT Compilation =========="
-//          << endl;
-
-//     cout << "Hot instructions detected: "
-//          << hotInstructions.size()
-//          << endl;
-
-//     JITCompiler jitCompiler;
-
-//     long long jitCompilationTime = 0;
-
-//     if (!hotInstructions.empty())
-//     {
-//         cout << "Passing hot instructions to JIT compiler..."
-//              << endl;
-
-//         cout << endl;
-//         cout << "========== First JIT Request =========="
-//              << endl;
-
-//         cout << "Checking code cache..."
-//              << endl;
-
-//         if (jitCompiler.isCached(hotInstructions))
-//         {
-//             cout << "[CACHE] HIT"
-//                  << endl;
-
-//             cout << "[CACHE] Reusing previously compiled code."
-//                  << endl;
-//         }
-//         else
-//         {
-//             cout << "[CACHE] MISS"
-//                  << endl;
-
-//             cout << "[CACHE] No compiled code found."
-//                  << endl;
-
-//             cout << endl;
-//             cout << "[JIT] Code cache MISS."
-//                  << endl;
-
-//             cout << "[JIT] No compiled hot block found."
-//                  << endl;
-
-//             Benchmark jitCompilationBenchmark;
-
-//             jitCompilationBenchmark.start();
-
-//             jitCompiler.compile(
-//                 hotInstructions
-//             );
-
-//             jitCompilationTime =
-//                 jitCompilationBenchmark
-//                     .stopMicroseconds();
-//         }
-
-//         jitCompiler.printCompilationInfo();
-//     }
-//     else
-//     {
-//         cout << "No hot instructions detected."
-//              << endl;
-
-//         cout << "JIT compilation skipped."
-//              << endl;
-//     }
-
-
-//     // ========================================================
-//     // PHASE 6 — INITIAL JIT EXECUTION
-//     // ========================================================
-
-//     if (!hotInstructions.empty())
-//     {
-//         cout << endl;
-//         cout << "========== Initial JIT Execution =========="
-//              << endl;
-
-//         cout << "Executing optimized hot region..."
-//              << endl;
-
-//         jitCompiler.executeOptimizedLoop(10000);
-
-//         cout << "[JIT] Initial optimized execution completed."
-//              << endl;
-//     }
-
-
-//     // ========================================================
-//     // PHASE 7 — SECOND CACHE REQUEST
-//     // ========================================================
-
-//     if (!hotInstructions.empty())
-//     {
-//         cout << endl;
-
-//         cout << "========== Second JIT Request =========="
-//              << endl;
-
-//         cout << "Checking code cache again..."
-//              << endl;
-
-//         if (jitCompiler.isCached(hotInstructions))
-//         {
-//             cout << "[CACHE] HIT"
-//                  << endl;
-
-//             cout << "[CACHE] Reusing previously compiled code."
-//                  << endl;
-//         }
-//         else
-//         {
-//             cout << "[CACHE] MISS"
-//                  << endl;
-//         }
-
-//         // Request the same compilation again.
-//         // JITCompiler should reuse the cached block.
-
-//         jitCompiler.compile(
-//             hotInstructions
-//         );
-
-//         cout << endl;
-
-//         cout << "[CACHE] Cached code reused successfully."
-//              << endl;
-
-
-//         // ----------------------------------------------------
-//         // FINAL CACHE STATUS
-//         // ----------------------------------------------------
-
-//         cout << endl;
-
-//         cout << "========== Final Cache Status =========="
-//              << endl;
-
-//         cout << "Code Cache Entries: "
-//              << jitCompiler.getCacheSize()
-//              << endl;
-
-//         cout << "Code caching phase completed successfully."
-//              << endl;
-//     }
-
-
-//     // ========================================================
-//     // PHASE 8 — FAIR JIT PERFORMANCE BENCHMARK
-//     // ========================================================
-
-//     if (!hotInstructions.empty())
-//     {
-//         cout << endl;
-
-//         cout << "========== Phase 8: JIT Performance Benchmark =========="
-//              << endl;
-
-//         const int BENCHMARK_ITERATIONS = 100;
-
-
-//         // ----------------------------------------------------
-//         // Interpreter Benchmark
-//         // ----------------------------------------------------
-
-//         cout << endl;
-
-//         cout << "[BENCHMARK] Running interpreter "
-//              << BENCHMARK_ITERATIONS
-//              << " times..."
-//              << endl;
-
-//         Benchmark interpreterRepeatedBenchmark;
-
-//         interpreterRepeatedBenchmark.start();
-
-//         for (int i = 0;
-//              i < BENCHMARK_ITERATIONS;
-//              i++)
-//         {
-//             vm.execute(program);
-//         }
-
-//         long long interpreterTotalTime =
-//             interpreterRepeatedBenchmark
-//                 .stopMicroseconds();
-
-//         double interpreterAverage =
-//             static_cast<double>(
-//                 interpreterTotalTime
-//             )
-//             /
-//             BENCHMARK_ITERATIONS;
-
-
-//         // ----------------------------------------------------
-//         // JIT Steady-State Benchmark
-//         // ----------------------------------------------------
-
-//         cout << endl;
-
-//         cout << "[BENCHMARK] Running optimized JIT loop "
-//              << BENCHMARK_ITERATIONS
-//              << " times..."
-//              << endl;
-
-//         Benchmark jitRepeatedBenchmark;
-
-//         jitRepeatedBenchmark.start();
-
-//         for (int i = 0;
-//              i < BENCHMARK_ITERATIONS;
-//              i++)
-//         {
-//             jitCompiler.executeOptimizedLoop(10000);
-//         }
-
-//         long long jitTotalTime =
-//             jitRepeatedBenchmark
-//                 .stopMicroseconds();
-
-//         double jitAverage =
-//             static_cast<double>(
-//                 jitTotalTime
-//             )
-//             /
-//             BENCHMARK_ITERATIONS;
-
-
-//         // ----------------------------------------------------
-//         // Benchmark Results
-//         // ----------------------------------------------------
-
-//         cout << endl;
-
-//         cout << "========== Benchmark Results =========="
-//              << endl;
-
-//         cout << endl;
-
-//         cout << "Benchmark Iterations       : "
-//              << BENCHMARK_ITERATIONS
-//              << endl;
-
-//         cout << "Interpreter Total Time     : "
-//              << interpreterTotalTime
-//              << " microseconds"
-//              << endl;
-
-//         cout << "Interpreter Average Time   : "
-//              << interpreterAverage
-//              << " microseconds"
-//              << endl;
-
-//         cout << "JIT Compilation Time       : "
-//              << jitCompilationTime
-//              << " microseconds"
-//              << endl;
-
-//         cout << "JIT Steady-State Total     : "
-//              << jitTotalTime
-//              << " microseconds"
-//              << endl;
-
-//         cout << "JIT Steady-State Average   : "
-//              << jitAverage
-//              << " microseconds"
-//              << endl;
-
-//         cout << "Hot Instructions           : "
-//              << hotInstructions.size()
-//              << endl;
-
-//         cout << "Compiled Instructions      : "
-//              << hotInstructions.size()
-//              << endl;
-
-//         cout << "Code Cache Entries         : "
-//              << jitCompiler.getCacheSize()
-//              << endl;
-
-
-//         // ----------------------------------------------------
-//         // Performance Comparison
-//         // ----------------------------------------------------
-
-//         cout << endl;
-
-//         cout << "========== Performance Comparison =========="
-//              << endl;
-
-//         cout << endl;
-
-//         cout << "Interpreter Average : "
-//              << interpreterAverage
-//              << " microseconds"
-//              << endl;
-
-//         cout << "JIT Average         : "
-//              << jitAverage
-//              << " microseconds"
-//              << endl;
-
-//         if (jitAverage > 0.0)
-//         {
-//             double speedup =
-//                 interpreterAverage
-//                 /
-//                 jitAverage;
-
-//             cout << "JIT Steady-State Speedup : "
-//                  << speedup
-//                  << "x"
-//                  << endl;
-
-//             if (speedup > 1.0)
-//             {
-//                 cout << "RESULT: JIT is faster than "
-//                      << "the interpreter."
-//                      << endl;
-//             }
-//             else
-//             {
-//                 cout << "RESULT: JIT is currently slower "
-//                      << "than the interpreter."
-//                      << endl;
-//             }
-//         }
-//         else
-//         {
-//             cout << "JIT Speedup : N/A"
-//                  << endl;
-//         }
-
-
-//         // ----------------------------------------------------
-//         // Break-Even Analysis
-//         // ----------------------------------------------------
-
-//         cout << endl;
-
-//         cout << "========== JIT Break-Even Analysis =========="
-//              << endl;
-
-//         if (jitAverage < interpreterAverage)
-//         {
-//             double compilationCost =
-//                 static_cast<double>(
-//                     jitCompilationTime
-//                 );
-
-//             double savingPerExecution =
-//                 interpreterAverage
-//                 -
-//                 jitAverage;
-
-//             if (savingPerExecution > 0.0)
-//             {
-//                 double breakEven =
-//                     compilationCost
-//                     /
-//                     savingPerExecution;
-
-//                 cout << "Compilation Cost : "
-//                      << compilationCost
-//                      << " microseconds"
-//                      << endl;
-
-//                 cout << "Saving Per Run   : "
-//                      << savingPerExecution
-//                      << " microseconds"
-//                      << endl;
-
-//                 cout << "Break-Even Point : "
-//                      << breakEven
-//                      << " executions"
-//                      << endl;
-//             }
-//         }
-//         else
-//         {
-//             cout << "JIT is not faster in the "
-//                  << "current benchmark."
-//                  << endl;
-
-//             cout << "No positive break-even point "
-//                  << "can be calculated."
-//                  << endl;
-//         }
-
-
-//         cout << endl;
-
-//         cout << "Note: JIT compilation cost is measured "
-//              << "separately from steady-state execution."
-//              << endl;
-
-//         cout << "The speedup comparison measures repeated "
-//              << "execution after compilation."
-//              << endl;
-
-//         cout << endl;
-
-//         cout << "Benchmark completed successfully."
-//              << endl;
-//     }
-//     else
-//     {
-//         cout << endl;
-
-//         cout << "========== Phase 8: Benchmarking =========="
-//              << endl;
-
-//         cout << "Benchmark skipped because no hot code "
-//              << "was detected."
-//              << endl;
-//     }
-
-
-//     // ========================================================
-//     // PROGRAM COMPLETED
-//     // ========================================================
-
-//     cout << endl;
-
-//     cout << "===================================="
-//          << endl;
-
-//     cout << "          Program Completed"
-//          << endl;
-
-//     cout << "===================================="
-//          << endl;
-
-
-//     return 0;
-// }
-
 
 
 
@@ -1435,6 +44,9 @@
 #include <utility>
 #include <chrono>
 #include <iomanip>
+#include <limits>
+#include <cmath>
+#include <cstdint>
 
 #include "bytecode/Instruction.h"
 #include "vm/StackVM.h"
@@ -1638,6 +250,22 @@ string opcodeToString(OpCode opcode)
 
 
 // ============================================================
+// Benchmark guard: the current optimized JIT path only supports
+// this specific countdown bytecode pattern.
+// ============================================================
+bool isSupportedCountdownProgram(const vector<Instruction>& program) {
+    return program.size() == 8 &&
+        program[0].opcode == OpCode::PUSH && program[0].operand > 0 &&
+        program[1].opcode == OpCode::DUP &&
+        program[2].opcode == OpCode::JUMP_IF_ZERO && program[2].operand == 7 &&
+        program[3].opcode == OpCode::PUSH && program[3].operand == 1 &&
+        program[4].opcode == OpCode::SUB &&
+        program[5].opcode == OpCode::JUMP && program[5].operand == 1 &&
+        program[6].opcode == OpCode::PRINT &&
+        program[7].opcode == OpCode::HALT;
+}
+
+// ============================================================
 // Main
 // ============================================================
 
@@ -1653,12 +281,14 @@ int main()
     // PHASE 1 — Bytecode Input
     // ========================================================
 
-    int instructionCount;
+    int instructionCount = 0;
 
     cout << "Enter number of instructions: ";
-    cin >> instructionCount;
-
-    cin.ignore();
+    if (!(cin >> instructionCount)) {
+        cerr << "Invalid instruction count. Enter a positive integer." << endl;
+        return 1;
+    }
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
     if (instructionCount <= 0)
     {
@@ -1729,7 +359,16 @@ int main()
     cout << "========== Execution =========="
          << endl;
 
-    StackVM vm;
+   int hotspotThreshold;
+
+cout << "\nEnter hotspot threshold (positive integer): ";
+
+if (!(cin >> hotspotThreshold) || hotspotThreshold <= 0) {
+    cerr << "Invalid threshold. Enter a positive integer." << endl;
+    return 1;
+}      
+//  StackVM vm;
+StackVM vm(static_cast<std::size_t>(hotspotThreshold));
 
     Benchmark interpreterBenchmark;
 
@@ -1737,7 +376,7 @@ int main()
 
     vm.execute(program);
 
-    long long interpreterTime =
+    double interpreterTime =
         interpreterBenchmark.stopMicroseconds();
 
 
@@ -1914,7 +553,7 @@ int main()
             hotInstructions
         );
 
-        long long jitCompilationTime =
+        double jitCompilationTime =
             compilationBenchmark.stopMicroseconds();
 
 
@@ -1971,389 +610,135 @@ int main()
         const int benchmarkIterations = 100;
 
 
-        cout << endl;
-
-        cout << "Benchmark Iterations       : "
-             << benchmarkIterations
-             << endl;
-
-        cout << "Loop Iterations per Run   : 10000"
-             << endl;
-
-
         // ----------------------------------------------------
-        // Interpreter repeated benchmark
+        // Benchmark equivalent countdown work in batches.
+        // The current JIT prototype supports only the exact
+        // countdown bytecode pattern checked below.
         // ----------------------------------------------------
-
-        cout << endl;
-
-        cout << "[BENCHMARK] Running interpreter "
-             << benchmarkIterations
-             << " times..."
-             << endl;
-
-
-        long long interpreterTotalTime = 0;
-
-
-        for (int i = 0;
-             i < benchmarkIterations;
-             ++i)
-        {
-            Benchmark benchmark;
-
-            benchmark.start();
-
-            /*
-             * Execute the complete bytecode program.
-             *
-             * The result is not printed because PRINT is
-             * deliberately avoided during benchmarking.
-             */
-
-            vm.execute(program);
-
-            interpreterTotalTime +=
-                benchmark.stopMicroseconds();
-        }
-
-
-        long long interpreterAverageTime =
-            interpreterTotalTime /
-            benchmarkIterations;
-
-
-        // ----------------------------------------------------
-        // JIT repeated benchmark
-        // ----------------------------------------------------
-
-        cout << endl;
-
-        cout << "[BENCHMARK] Running optimized JIT loop "
-             << benchmarkIterations
-             << " times..."
-             << endl;
-
-
-        long long jitSteadyStateTotalTime = 0;
-
-
-        for (int i = 0;
-             i < benchmarkIterations;
-             ++i)
-        {
-            Benchmark benchmark;
-
-            benchmark.start();
-
-            /*
-             * IMPORTANT:
-             *
-             * Compilation does NOT happen here.
-             *
-             * The compiled representation already exists
-             * in the code cache.
-             *
-             * This measures the steady-state execution cost
-             * of the optimized JIT path.
-             */
-
-            jitCompiler.executeOptimizedLoop(10000);
-
-            jitSteadyStateTotalTime +=
-                benchmark.stopMicroseconds();
-        }
-
-
-        long long jitSteadyStateAverageTime =
-            jitSteadyStateTotalTime /
-            benchmarkIterations;
-
-
-        // ====================================================
-        // SECOND CACHE REQUEST
-        // ====================================================
-
-        cout << endl;
-
-        cout << "========== Second JIT Request =========="
-             << endl;
-
-        cout << "Checking code cache again..."
-             << endl;
-
-
-        if (jitCompiler.isCached(hotInstructions))
-        {
-            cout << "[CACHE] HIT"
-                 << endl;
-
-            cout << "[CACHE] Reusing previously compiled code."
-                 << endl;
-        }
-        else
-        {
-            cout << "[CACHE] MISS"
-                 << endl;
-        }
-
-
-        /*
-         * Requesting compilation again should reuse the cached
-         * representation instead of creating another entry.
-         */
-
-        jitCompiler.compile(
-            hotInstructions
-        );
-
-
-        cout << endl;
-
-        cout << "[CACHE] Cached code reused successfully."
-             << endl;
-
-
-        // ====================================================
-        // FINAL CACHE STATUS
-        // ====================================================
-
-        cout << endl;
-
-        cout << "========== Final Cache Status =========="
-             << endl;
-
-        cout << "Code Cache Entries: "
-             << jitCompiler.getCacheSize()
-             << endl;
-
-        cout << "Code caching phase completed successfully."
-             << endl;
-
-
-        // ====================================================
-        // BENCHMARK RESULTS
-        // ====================================================
-
-        cout << endl;
-
-        cout << "========== Benchmark Results =========="
-             << endl;
-
-
-        cout << endl;
-
-        cout << "Benchmark Iterations       : "
-             << benchmarkIterations
-             << endl;
-
-        cout << "Interpreter Total Time     : "
-             << interpreterTotalTime
-             << " microseconds"
-             << endl;
-
-        cout << "Interpreter Average Time   : "
-             << interpreterAverageTime
-             << " microseconds"
-             << endl;
-
-        cout << "JIT Compilation Time       : "
-             << jitCompilationTime
-             << " microseconds"
-             << endl;
-
-        cout << "JIT Steady-State Total     : "
-             << jitSteadyStateTotalTime
-             << " microseconds"
-             << endl;
-
-        cout << "JIT Steady-State Average   : "
-             << jitSteadyStateAverageTime
-             << " microseconds"
-             << endl;
-
-
-        cout << endl;
-
-        cout << "Hot Instructions           : "
-             << hotInstructions.size()
-             << endl;
-
-        cout << "Compiled Instructions      : "
-             << hotInstructions.size()
-             << endl;
-
-        cout << "Code Cache Entries         : "
-             << jitCompiler.getCacheSize()
-             << endl;
-
-
-        // ====================================================
-        // PERFORMANCE COMPARISON
-        // ====================================================
-
-        cout << endl;
-
-        cout << "========== Performance Comparison =========="
-             << endl;
-
-
-        cout << endl;
-
-        cout << "Interpreter Average : "
-             << interpreterAverageTime
-             << " microseconds"
-             << endl;
-
-        cout << "JIT Average         : "
-             << jitSteadyStateAverageTime
-             << " microseconds"
-             << endl;
-
-
-        if (jitSteadyStateAverageTime > 0)
-        {
-            double speedup =
-                static_cast<double>(
-                    interpreterAverageTime
-                )
-                /
-                static_cast<double>(
-                    jitSteadyStateAverageTime
-                );
-
-
-            cout << "JIT Steady-State Speedup : "
-                 << fixed
-                 << setprecision(2)
-                 << speedup
-                 << "x"
-                 << endl;
-
-
-            if (speedup > 1.0)
-            {
-                cout << "[SUCCESS] JIT execution is faster "
-                     << "than interpreter execution."
-                     << endl;
-            }
-            else
-            {
-                cout << "[INFO] JIT steady-state execution "
-                     << "is not yet faster for this workload."
-                     << endl;
-            }
-        }
-        else
-        {
-            cout << "JIT Steady-State Speedup : N/A"
-                 << endl;
-        }
-
-
-        // ====================================================
-        // BREAK-EVEN ANALYSIS
-        // ====================================================
-
-        cout << endl;
-
-        cout << "========== JIT Break-Even Analysis =========="
-             << endl;
-
-
-        if (jitSteadyStateAverageTime <
-            interpreterAverageTime &&
-            interpreterAverageTime > 0)
-        {
-            long long savingPerRun =
-                interpreterAverageTime
-                -
-                jitSteadyStateAverageTime;
-
-
-            double breakEvenRuns =
-                static_cast<double>(
-                    jitCompilationTime
-                )
-                /
-                static_cast<double>(
-                    savingPerRun
-                );
-
-
-            cout << "Compilation Overhead : "
-                 << jitCompilationTime
-                 << " microseconds"
-                 << endl;
-
-            cout << "Saving Per Run       : "
-                 << savingPerRun
-                 << " microseconds"
-                 << endl;
-
-            cout << "Break-Even Runs      : "
-                 << fixed
-                 << setprecision(2)
-                 << breakEvenRuns
-                 << endl;
-
+        if (!isSupportedCountdownProgram(program)) {
+            cout << "\n[BENCHMARK] Skipped: this JIT benchmark currently "
+                 << "supports only the documented countdown program." << endl;
+            cout << "Use the expected 8-instruction countdown pattern to "
+                 << "compare interpreter and optimized-loop timings." << endl;
+        } else {
+            const int64_t initialValue = program[0].operand;
+            const int benchmarkIterations = 100;
 
             cout << endl;
+            cout << "Benchmark Iterations       : " << benchmarkIterations << endl;
+            cout << "Loop Iterations per Run    : " << initialValue << endl;
 
-            cout << "After approximately "
-                 << static_cast<long long>(
-                        breakEvenRuns + 1
-                    )
-                 << " repeated executions, "
-                 << "the JIT can recover its compilation cost."
-                 << endl;
+            // Warm both paths before timing to reduce first-run effects.
+            vm.execute(program);
+            volatile int64_t warmupResult =
+                jitCompiler.executeOptimizedLoop(initialValue);
+            (void)warmupResult;
+
+            cout << endl;
+            cout << "[BENCHMARK] Running interpreter "
+                 << benchmarkIterations << " times..." << endl;
+
+            Benchmark interpreterBatch;
+            interpreterBatch.start();
+            for (int i = 0; i < benchmarkIterations; ++i) {
+                vm.execute(program);
+            }
+            double interpreterTotalTime = interpreterBatch.stopMicroseconds();
+            double interpreterAverageTime =
+                interpreterTotalTime / static_cast<double>(benchmarkIterations);
+
+            cout << endl;
+            cout << "[BENCHMARK] Running optimized JIT loop "
+                 << benchmarkIterations << " times..." << endl;
+
+            // Keep the result observable so the compiler cannot discard the work.
+            volatile int64_t benchmarkResult = -1;
+            Benchmark jitBatch;
+            jitBatch.start();
+            for (int i = 0; i < benchmarkIterations; ++i) {
+                benchmarkResult = jitCompiler.executeOptimizedLoop(initialValue);
+            }
+            double jitSteadyStateTotalTime = jitBatch.stopMicroseconds();
+            double jitSteadyStateAverageTime =
+                jitSteadyStateTotalTime / static_cast<double>(benchmarkIterations);
+
+            // The supported countdown pattern should finish at zero in both paths.
+            // StackVM currently exposes no final-stack getter, so main.cpp cannot
+            // independently compare the two runtime results. Do not claim a verified
+            // result-equivalence test until such an API/test is added.
+            const bool supportedPattern = isSupportedCountdownProgram(program);
+
+            cout << endl;
+            cout << "========== Second JIT Request ==========" << endl;
+            cout << "Checking code cache again..." << endl;
+            if (jitCompiler.isCached(hotInstructions)) {
+                cout << "[CACHE] HIT" << endl;
+                cout << "[CACHE] Reusing previously compiled code." << endl;
+            } else {
+                cout << "[CACHE] MISS" << endl;
+            }
+            jitCompiler.compile(hotInstructions);
+            cout << endl << "[CACHE] Cached code reused successfully." << endl;
+
+            cout << endl << "========== Final Cache Status ==========" << endl;
+            cout << "Code Cache Entries: " << jitCompiler.getCacheSize() << endl;
+            cout << "Code caching phase completed successfully." << endl;
+
+            cout << fixed << setprecision(3);
+            cout << endl << "========== Benchmark Results ==========" << endl;
+            cout << "Benchmark Iterations       : " << benchmarkIterations << endl;
+            cout << "Loop Iterations per Run    : " << initialValue << endl;
+            cout << "Interpreter Total Time     : " << interpreterTotalTime << " microseconds" << endl;
+            cout << "Interpreter Average Time   : " << interpreterAverageTime << " microseconds" << endl;
+            cout << "JIT Compilation Time       : " << jitCompilationTime << " microseconds" << endl;
+            cout << "JIT Steady-State Total     : " << jitSteadyStateTotalTime << " microseconds" << endl;
+            cout << "JIT Steady-State Average   : " << jitSteadyStateAverageTime << " microseconds" << endl;
+            cout << "Supported Pattern          : " << (supportedPattern ? "YES" : "NO") << endl;
+            cout << "JIT Final Countdown Result : " << benchmarkResult << endl;
+            cout << "Expected Countdown Result  : 0" << endl;
+            cout << "JIT Result Check           : " << (benchmarkResult == 0 ? "PASS" : "FAIL") << endl;
+            cout << "Interpreter Result Check   : NOT AVAILABLE (VM exposes no result getter)" << endl;
+            cout << "Hot Instructions           : " << hotInstructions.size() << endl;
+            cout << "Compiled Instructions      : " << hotInstructions.size() << endl;
+            cout << "Code Cache Entries         : " << jitCompiler.getCacheSize() << endl;
+
+            cout << endl << "========== Performance Comparison ==========" << endl;
+            cout << "Interpreter Average : " << interpreterAverageTime << " microseconds" << endl;
+            cout << "JIT Average         : " << jitSteadyStateAverageTime << " microseconds" << endl;
+
+            if (supportedPattern && interpreterAverageTime > 0.0 && jitSteadyStateAverageTime > 0.0) {
+                const double speedup = interpreterAverageTime / jitSteadyStateAverageTime;
+                cout << "JIT Steady-State Speedup : " << speedup << "x" << endl;
+                cout << (speedup > 1.0
+                    ? "[RESULT] Optimized loop is faster for this workload."
+                    : "[RESULT] Optimized loop is not faster for this workload.") << endl;
+            } else {
+                cout << "JIT Steady-State Speedup : N/A (invalid/too-small timing or result check failed)" << endl;
+            }
+
+            cout << endl << "========== JIT Break-Even Analysis ==========" << endl;
+            const double savingPerRun = interpreterAverageTime - jitSteadyStateAverageTime;
+            cout << "Compilation Overhead : " << jitCompilationTime << " microseconds" << endl;
+            cout << "Saving Per Run       : " << savingPerRun << " microseconds" << endl;
+            if (supportedPattern && interpreterAverageTime > 0.0 &&
+                jitSteadyStateAverageTime > 0.0 && savingPerRun > 0.0) {
+                const double breakEvenRuns = jitCompilationTime / savingPerRun;
+                cout << "Break-Even Runs      : " << ceil(breakEvenRuns) << endl;
+            } else {
+                cout << "Break-Even Runs      : N/A (requires valid positive timings and positive saving)" << endl;
+            }
+
+            cout << endl << "Benchmark methodology:" << endl;
+            cout << "1. Both paths use the same countdown input value." << endl;
+            cout << "2. Compilation overhead is measured separately." << endl;
+            cout << "3. Each timing measures a batch of repeated executions." << endl;
+            cout << "4. Fractional microseconds are preserved in the reported average." << endl;
+            cout << "5. Speedup and break-even require positive measured timings and a supported pattern." << endl;
+            cout << "6. JIT result is checked; interpreter result equivalence still requires a VM result getter or dedicated test." << endl;
+            cout << "Note: this is an optimized hot-loop prototype, not native machine-code generation." << endl;
+            cout << endl << "Benchmark completed." << endl;
         }
-        else
-        {
-            cout << "Break-even point cannot be demonstrated "
-                 << "because the measured JIT steady-state "
-                 << "execution is not faster than the interpreter."
-                 << endl;
-        }
-
-
-        // ====================================================
-        // FINAL NOTE
-        // ====================================================
-
-        cout << endl;
-
-        cout << "Benchmark methodology:"
-             << endl;
-
-        cout << "1. Interpreter execution is measured repeatedly."
-             << endl;
-
-        cout << "2. JIT compilation is measured separately."
-             << endl;
-
-        cout << "3. Compiled code is warmed up before benchmarking."
-             << endl;
-
-        cout << "4. JIT steady-state execution is measured "
-             << "without recompilation."
-             << endl;
-
-        cout << "5. Interpreter and JIT average execution times "
-             << "are compared."
-             << endl;
-
-        cout << "6. Compilation overhead and break-even behavior "
-             << "are reported separately."
-             << endl;
-
-
-        cout << endl;
-
-        cout << "Benchmark completed successfully."
-             << endl;
-    }
-
+    } // Close the outer JIT-compilation else block
 
     // ========================================================
     // PROGRAM COMPLETED

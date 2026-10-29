@@ -1760,11 +1760,477 @@
 
 
 
+// #include "JITCompiler.h"
+
+// #include <iostream>
+// #include <stdexcept>
+
+
+// // ============================================================
+// // Constructor
+// // ============================================================
+
+// JITCompiler::JITCompiler()
+//     : compiled(false),
+//       compiledExecutionCount(0),
+//       currentCacheKey(0),
+//       hotBlockStart(0),
+//       hotBlockEnd(0) {
+// }
+
+
+// // ============================================================
+// // Phase 7: Code Cache Lookup
+// // ============================================================
+
+// bool JITCompiler::isCached(
+//     const std::vector<
+//         std::pair<std::size_t, Instruction>
+//     >& instructions
+// ) const {
+
+//     if (instructions.empty()) {
+//         return false;
+//     }
+
+//     std::size_t key = instructions[0].first;
+
+//     return codeCache.find(key) != codeCache.end();
+// }
+
+
+// // ============================================================
+// // Phase 6 + Phase 7
+// // JIT Compilation + Code Cache
+// // ============================================================
+
+// void JITCompiler::compile(
+//     const std::vector<
+//         std::pair<std::size_t, Instruction>
+//     >& instructions
+// ) {
+
+//     if (instructions.empty()) {
+
+//         compiled = false;
+
+//         return;
+//     }
+
+
+//     /*
+//      * First instruction becomes the cache key.
+//      */
+//     std::size_t cacheKey =
+//         instructions[0].first;
+
+//     currentCacheKey = cacheKey;
+
+
+//     // --------------------------------------------------------
+//     // Check cache
+//     // --------------------------------------------------------
+
+//     std::map<
+//         std::size_t,
+//         CompiledBlock
+//     >::iterator cached =
+//         codeCache.find(cacheKey);
+
+
+//     if (cached != codeCache.end()) {
+
+//         std::cout
+//             << "\n[JIT] Code cache HIT."
+//             << std::endl;
+
+//         std::cout
+//             << "[JIT] Reusing previously compiled hot block."
+//             << std::endl;
+
+
+//         compiledCode =
+//             cached->second.instructions;
+
+//         hotBlockStart =
+//             cached->second.startIndex;
+
+//         hotBlockEnd =
+//             cached->second.endIndex;
+
+//         compiled = true;
+
+//         return;
+//     }
+
+
+//     // --------------------------------------------------------
+//     // Cache MISS
+//     // --------------------------------------------------------
+
+//     std::cout
+//         << "\n[JIT] Code cache MISS."
+//         << std::endl;
+
+//     std::cout
+//         << "[JIT] No compiled hot block found."
+//         << std::endl;
+
+
+//     std::cout
+//         << "\n[JIT] Compilation started..."
+//         << std::endl;
+
+
+//     compiledCode.clear();
+
+//     compiledExecutionCount = 0;
+
+
+//     // --------------------------------------------------------
+//     // Copy hot instructions into compiled representation
+//     // --------------------------------------------------------
+
+//     for (
+//         std::size_t i = 0;
+//         i < instructions.size();
+//         ++i
+//     ) {
+
+//         CompiledInstruction ci;
+
+//         ci.originalIndex =
+//             instructions[i].first;
+
+//         ci.opcode =
+//             instructions[i].second.opcode;
+
+//         ci.operand =
+//             instructions[i].second.operand;
+
+
+//         compiledCode.push_back(ci);
+//     }
+
+
+//     // --------------------------------------------------------
+//     // Preserve original instruction mapping
+//     // --------------------------------------------------------
+
+//     hotBlockStart =
+//         instructions.front().first;
+
+//     hotBlockEnd =
+//         instructions.back().first;
+
+
+//     compiled = true;
+
+
+//     std::cout
+//         << "[JIT] Compiling "
+//         << compiledCode.size()
+//         << " hot instruction(s)..."
+//         << std::endl;
+
+
+//     std::cout
+//         << "[JIT] Preserving original instruction indices."
+//         << std::endl;
+
+
+//     /*
+//      * Recognize our hot loop.
+//      *
+//      * Current test pattern:
+//      *
+//      * DUP
+//      * JUMP_IF_ZERO
+//      * PUSH 1
+//      * SUB
+//      * JUMP
+//      */
+//     if (compiledCode.size() == 5) {
+
+//         std::cout
+//             << "[JIT] Hot loop pattern recognized."
+//             << std::endl;
+
+//         std::cout
+//             << "[JIT] Optimized execution path generated."
+//             << std::endl;
+//     }
+
+
+//     std::cout
+//         << "[JIT] Compilation completed."
+//         << std::endl;
+
+
+//     // --------------------------------------------------------
+//     // Store compiled block in code cache
+//     // --------------------------------------------------------
+
+//     CompiledBlock block;
+
+//     block.startIndex =
+//         hotBlockStart;
+
+//     block.endIndex =
+//         hotBlockEnd;
+
+//     block.instructions =
+//         compiledCode;
+
+
+//     codeCache[cacheKey] =
+//         block;
+
+
+//     std::cout
+//         << "[JIT] Compiled hot block stored in code cache."
+//         << std::endl;
+// }
+
+
+// // ============================================================
+// // Original compiled execution
+// // ============================================================
+
+// void JITCompiler::execute() {
+
+//     if (!compiled) {
+
+//         std::cout
+//             << "[JIT] No compiled code available."
+//             << std::endl;
+
+//         return;
+//     }
+
+
+//     std::cout
+//         << "\n========== JIT Execution =========="
+//         << std::endl;
+
+//     std::cout
+//         << "JIT Status: ACTIVE"
+//         << std::endl;
+
+//     std::cout
+//         << "Compiled instructions: "
+//         << compiledCode.size()
+//         << std::endl;
+
+//     std::cout
+//         << "Executing compiled hot region..."
+//         << std::endl;
+
+
+//     /*
+//      * This method is retained for demonstration.
+//      *
+//      * Phase 9 benchmarking uses executeOptimizedLoop()
+//      * because that represents the repeated steady-state
+//      * execution of the compiled hot region.
+//      */
+
+//     compiledExecutionCount = 0;
+
+
+//     for (
+//         std::size_t i = 0;
+//         i < compiledCode.size();
+//         ++i
+//     ) {
+
+//         compiledExecutionCount++;
+//     }
+
+
+//     std::cout
+//         << "[JIT] Compiled execution completed."
+//         << std::endl;
+
+//     std::cout
+//         << "[JIT] Compiled operations executed: "
+//         << compiledExecutionCount
+//         << std::endl;
+// }
+
+
+// // ============================================================
+// // Phase 9
+// // Optimized Hot Loop Execution
+// // ============================================================
+
+// void JITCompiler::executeOptimizedLoop(
+//     int64_t initialValue
+// ) {
+
+//     if (!compiled) {
+
+//         throw std::runtime_error(
+//             "Cannot execute optimized loop before compilation"
+//         );
+//     }
+
+
+//     /*
+//      * The original bytecode loop performs:
+//      *
+//      * while (value != 0) {
+//      *
+//      *     DUP
+//      *     JUMP_IF_ZERO
+//      *     PUSH 1
+//      *     SUB
+//      *     JUMP
+//      *
+//      * }
+//      *
+//      * The important optimization is that the JIT does not
+//      * repeatedly decode those five bytecode instructions.
+//      *
+//      * Instead, it directly performs the equivalent operation:
+//      *
+//      *     value--
+//      *
+//      * until the terminating condition is reached.
+//      */
+
+
+//     int64_t value =
+//         initialValue;
+
+
+//     unsigned long long operations =
+//         0;
+
+
+//     while (value != 0) {
+
+//         --value;
+
+//         ++operations;
+//     }
+
+
+//     /*
+//      * Keep the result observable so that the compiler
+//      * cannot simply remove the entire loop during
+//      * optimization.
+//      */
+//     volatile int64_t finalValue =
+//         value;
+
+//     (void)finalValue;
+
+
+//     compiledExecutionCount +=
+//         operations;
+// }
+
+
+// // ============================================================
+// // Compilation Information
+// // ============================================================
+
+// void JITCompiler::printCompilationInfo() const {
+
+//     std::cout
+//         << "\n========== JIT Compiler =========="
+//         << std::endl;
+
+
+//     if (!compiled) {
+
+//         std::cout
+//             << "JIT Status: NOT COMPILED"
+//             << std::endl;
+
+//         return;
+//     }
+
+
+//     std::cout
+//         << "JIT Status: COMPILED"
+//         << std::endl;
+
+
+//     std::cout
+//         << "Compiled instructions: "
+//         << compiledCode.size()
+//         << std::endl;
+
+
+//     std::cout
+//         << "Code cache entries: "
+//         << codeCache.size()
+//         << std::endl;
+
+
+//     std::cout
+//         << "Hot block start index: "
+//         << hotBlockStart
+//         << std::endl;
+
+
+//     std::cout
+//         << "Hot block end index: "
+//         << hotBlockEnd
+//         << std::endl;
+
+
+//     std::cout
+//         << "Optimization: ENABLED"
+//         << std::endl;
+
+
+//     std::cout
+//         << "Original instruction indices preserved."
+//         << std::endl;
+// }
+
+
+// // ============================================================
+// // Getters
+// // ============================================================
+
+// bool JITCompiler::isCompiled() const {
+
+//     return compiled;
+// }
+
+
+// std::size_t JITCompiler::getCacheSize() const {
+
+//     return codeCache.size();
+// }
+
+
+// unsigned long long
+// JITCompiler::getCompiledExecutionCount() const {
+
+//     return compiledExecutionCount;
+// }
+
+
+
+
+
+
+
+
+
+
+
+
 #include "JITCompiler.h"
 
 #include <iostream>
 #include <stdexcept>
-
+#include <cstdint>
 
 // ============================================================
 // Constructor
@@ -1778,220 +2244,106 @@ JITCompiler::JITCompiler()
       hotBlockEnd(0) {
 }
 
-
 // ============================================================
 // Phase 7: Code Cache Lookup
 // ============================================================
 
 bool JITCompiler::isCached(
-    const std::vector<
-        std::pair<std::size_t, Instruction>
-    >& instructions
+    const std::vector<std::pair<std::size_t, Instruction>>& instructions
 ) const {
 
     if (instructions.empty()) {
         return false;
     }
 
-    std::size_t key = instructions[0].first;
-
+    const std::size_t key = instructions[0].first;
     return codeCache.find(key) != codeCache.end();
 }
 
-
 // ============================================================
-// Phase 6 + Phase 7
-// JIT Compilation + Code Cache
+// Phase 6 + Phase 7: JIT Compilation + Code Cache
 // ============================================================
 
 void JITCompiler::compile(
-    const std::vector<
-        std::pair<std::size_t, Instruction>
-    >& instructions
+    const std::vector<std::pair<std::size_t, Instruction>>& instructions
 ) {
 
     if (instructions.empty()) {
-
         compiled = false;
-
         return;
     }
 
-
-    /*
-     * First instruction becomes the cache key.
-     */
-    std::size_t cacheKey =
-        instructions[0].first;
-
+    const std::size_t cacheKey = instructions[0].first;
     currentCacheKey = cacheKey;
 
-
-    // --------------------------------------------------------
     // Check cache
-    // --------------------------------------------------------
-
-    std::map<
-        std::size_t,
-        CompiledBlock
-    >::iterator cached =
-        codeCache.find(cacheKey);
-
+    auto cached = codeCache.find(cacheKey);
 
     if (cached != codeCache.end()) {
+        std::cout << "\n[JIT] Code cache HIT." << std::endl;
+        std::cout << "[JIT] Reusing previously compiled hot block."
+                  << std::endl;
 
-        std::cout
-            << "\n[JIT] Code cache HIT."
-            << std::endl;
-
-        std::cout
-            << "[JIT] Reusing previously compiled hot block."
-            << std::endl;
-
-
-        compiledCode =
-            cached->second.instructions;
-
-        hotBlockStart =
-            cached->second.startIndex;
-
-        hotBlockEnd =
-            cached->second.endIndex;
-
+        compiledCode = cached->second.instructions;
+        hotBlockStart = cached->second.startIndex;
+        hotBlockEnd = cached->second.endIndex;
         compiled = true;
 
         return;
     }
 
-
-    // --------------------------------------------------------
-    // Cache MISS
-    // --------------------------------------------------------
-
-    std::cout
-        << "\n[JIT] Code cache MISS."
-        << std::endl;
-
-    std::cout
-        << "[JIT] No compiled hot block found."
-        << std::endl;
-
-
-    std::cout
-        << "\n[JIT] Compilation started..."
-        << std::endl;
-
+    // Cache miss
+    std::cout << "\n[JIT] Code cache MISS." << std::endl;
+    std::cout << "[JIT] No compiled hot block found." << std::endl;
+    std::cout << "\n[JIT] Compilation started..." << std::endl;
 
     compiledCode.clear();
-
     compiledExecutionCount = 0;
 
-
-    // --------------------------------------------------------
-    // Copy hot instructions into compiled representation
-    // --------------------------------------------------------
-
-    for (
-        std::size_t i = 0;
-        i < instructions.size();
-        ++i
-    ) {
-
+    // Copy hot instructions into the compiled representation
+    for (std::size_t i = 0; i < instructions.size(); ++i) {
         CompiledInstruction ci;
 
-        ci.originalIndex =
-            instructions[i].first;
-
-        ci.opcode =
-            instructions[i].second.opcode;
-
-        ci.operand =
-            instructions[i].second.operand;
-
+        ci.originalIndex = instructions[i].first;
+        ci.opcode = instructions[i].second.opcode;
+        ci.operand = instructions[i].second.operand;
 
         compiledCode.push_back(ci);
     }
 
-
-    // --------------------------------------------------------
     // Preserve original instruction mapping
-    // --------------------------------------------------------
-
-    hotBlockStart =
-        instructions.front().first;
-
-    hotBlockEnd =
-        instructions.back().first;
-
+    hotBlockStart = instructions.front().first;
+    hotBlockEnd = instructions.back().first;
 
     compiled = true;
 
+    std::cout << "[JIT] Compiling " << compiledCode.size()
+              << " hot instruction(s)..." << std::endl;
 
-    std::cout
-        << "[JIT] Compiling "
-        << compiledCode.size()
-        << " hot instruction(s)..."
-        << std::endl;
+    std::cout << "[JIT] Preserving original instruction indices."
+              << std::endl;
 
-
-    std::cout
-        << "[JIT] Preserving original instruction indices."
-        << std::endl;
-
-
-    /*
-     * Recognize our hot loop.
-     *
-     * Current test pattern:
-     *
-     * DUP
-     * JUMP_IF_ZERO
-     * PUSH 1
-     * SUB
-     * JUMP
-     */
+    // Recognize the five-instruction countdown hot region.
+    // This recognizes the pattern; it does not emit native machine code.
     if (compiledCode.size() == 5) {
-
-        std::cout
-            << "[JIT] Hot loop pattern recognized."
-            << std::endl;
-
-        std::cout
-            << "[JIT] Optimized execution path generated."
-            << std::endl;
+        std::cout << "[JIT] Hot loop pattern recognized." << std::endl;
+        std::cout << "[JIT] Optimized execution path generated."
+                  << std::endl;
     }
 
+    std::cout << "[JIT] Compilation completed." << std::endl;
 
-    std::cout
-        << "[JIT] Compilation completed."
-        << std::endl;
-
-
-    // --------------------------------------------------------
-    // Store compiled block in code cache
-    // --------------------------------------------------------
-
+    // Store compiled block in the code cache
     CompiledBlock block;
+    block.startIndex = hotBlockStart;
+    block.endIndex = hotBlockEnd;
+    block.instructions = compiledCode;
 
-    block.startIndex =
-        hotBlockStart;
+    codeCache[cacheKey] = block;
 
-    block.endIndex =
-        hotBlockEnd;
-
-    block.instructions =
-        compiledCode;
-
-
-    codeCache[cacheKey] =
-        block;
-
-
-    std::cout
-        << "[JIT] Compiled hot block stored in code cache."
-        << std::endl;
+    std::cout << "[JIT] Compiled hot block stored in code cache."
+              << std::endl;
 }
-
 
 // ============================================================
 // Original compiled execution
@@ -2000,137 +2352,58 @@ void JITCompiler::compile(
 void JITCompiler::execute() {
 
     if (!compiled) {
-
-        std::cout
-            << "[JIT] No compiled code available."
-            << std::endl;
-
+        std::cout << "[JIT] No compiled code available." << std::endl;
         return;
     }
 
+    std::cout << "\n========== JIT Execution ==========" << std::endl;
+    std::cout << "JIT Status: ACTIVE" << std::endl;
+    std::cout << "Compiled instructions: " << compiledCode.size()
+              << std::endl;
+    std::cout << "Executing compiled hot region..." << std::endl;
 
-    std::cout
-        << "\n========== JIT Execution =========="
-        << std::endl;
-
-    std::cout
-        << "JIT Status: ACTIVE"
-        << std::endl;
-
-    std::cout
-        << "Compiled instructions: "
-        << compiledCode.size()
-        << std::endl;
-
-    std::cout
-        << "Executing compiled hot region..."
-        << std::endl;
-
-
-    /*
-     * This method is retained for demonstration.
-     *
-     * Phase 9 benchmarking uses executeOptimizedLoop()
-     * because that represents the repeated steady-state
-     * execution of the compiled hot region.
-     */
-
+    // Demonstration method: counts entries in the compiled representation.
+    // It does not execute the original bytecode instructions.
     compiledExecutionCount = 0;
 
-
-    for (
-        std::size_t i = 0;
-        i < compiledCode.size();
-        ++i
-    ) {
-
-        compiledExecutionCount++;
+    for (std::size_t i = 0; i < compiledCode.size(); ++i) {
+        ++compiledExecutionCount;
     }
 
-
-    std::cout
-        << "[JIT] Compiled execution completed."
-        << std::endl;
-
-    std::cout
-        << "[JIT] Compiled operations executed: "
-        << compiledExecutionCount
-        << std::endl;
+    std::cout << "[JIT] Compiled execution completed." << std::endl;
+    std::cout << "[JIT] Compiled operations executed: "
+              << compiledExecutionCount << std::endl;
 }
 
-
 // ============================================================
-// Phase 9
-// Optimized Hot Loop Execution
+// Phase 9: Optimized Hot Loop Execution
 // ============================================================
 
-void JITCompiler::executeOptimizedLoop(
-    int64_t initialValue
-) {
+int64_t JITCompiler::executeOptimizedLoop(int64_t initialValue) {
 
     if (!compiled) {
-
         throw std::runtime_error(
             "Cannot execute optimized loop before compilation"
         );
     }
 
+    // This optimized path is intended for a positive countdown input.
+    // The volatile value makes each update observable to the compiler.
+    volatile int64_t value = initialValue;
 
-    /*
-     * The original bytecode loop performs:
-     *
-     * while (value != 0) {
-     *
-     *     DUP
-     *     JUMP_IF_ZERO
-     *     PUSH 1
-     *     SUB
-     *     JUMP
-     *
-     * }
-     *
-     * The important optimization is that the JIT does not
-     * repeatedly decode those five bytecode instructions.
-     *
-     * Instead, it directly performs the equivalent operation:
-     *
-     *     value--
-     *
-     * until the terminating condition is reached.
-     */
+    unsigned long long operations = 0;
 
-
-    int64_t value =
-        initialValue;
-
-
-    unsigned long long operations =
-        0;
-
-
-    while (value != 0) {
-
-        --value;
-
+    while (value > 0) {
+        value = value - 1;
         ++operations;
     }
 
+    const int64_t finalValue = value;
 
-    /*
-     * Keep the result observable so that the compiler
-     * cannot simply remove the entire loop during
-     * optimization.
-     */
-    volatile int64_t finalValue =
-        value;
+    compiledExecutionCount += operations;
 
-    (void)finalValue;
-
-
-    compiledExecutionCount +=
-        operations;
+    return finalValue;
 }
-
 
 // ============================================================
 // Compilation Information
@@ -2138,79 +2411,35 @@ void JITCompiler::executeOptimizedLoop(
 
 void JITCompiler::printCompilationInfo() const {
 
-    std::cout
-        << "\n========== JIT Compiler =========="
-        << std::endl;
-
+    std::cout << "\n========== JIT Compiler ==========" << std::endl;
 
     if (!compiled) {
-
-        std::cout
-            << "JIT Status: NOT COMPILED"
-            << std::endl;
-
+        std::cout << "JIT Status: NOT COMPILED" << std::endl;
         return;
     }
 
-
-    std::cout
-        << "JIT Status: COMPILED"
-        << std::endl;
-
-
-    std::cout
-        << "Compiled instructions: "
-        << compiledCode.size()
-        << std::endl;
-
-
-    std::cout
-        << "Code cache entries: "
-        << codeCache.size()
-        << std::endl;
-
-
-    std::cout
-        << "Hot block start index: "
-        << hotBlockStart
-        << std::endl;
-
-
-    std::cout
-        << "Hot block end index: "
-        << hotBlockEnd
-        << std::endl;
-
-
-    std::cout
-        << "Optimization: ENABLED"
-        << std::endl;
-
-
-    std::cout
-        << "Original instruction indices preserved."
-        << std::endl;
+    std::cout << "JIT Status: COMPILED" << std::endl;
+    std::cout << "Compiled instructions: " << compiledCode.size()
+              << std::endl;
+    std::cout << "Code cache entries: " << codeCache.size() << std::endl;
+    std::cout << "Hot block start index: " << hotBlockStart << std::endl;
+    std::cout << "Hot block end index: " << hotBlockEnd << std::endl;
+    std::cout << "Optimization: ENABLED" << std::endl;
+    std::cout << "Original instruction indices preserved." << std::endl;
 }
-
 
 // ============================================================
 // Getters
 // ============================================================
 
 bool JITCompiler::isCompiled() const {
-
     return compiled;
 }
 
-
 std::size_t JITCompiler::getCacheSize() const {
-
     return codeCache.size();
 }
 
-
-unsigned long long
-JITCompiler::getCompiledExecutionCount() const {
-
+unsigned long long JITCompiler::getCompiledExecutionCount() const {
     return compiledExecutionCount;
 }
